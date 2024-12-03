@@ -31,8 +31,8 @@ class FFT(private val n: Int) {
             odd[i] = data[2 * i + 1]
         }
 
-        realForwardRecursive(even)
-        realForwardRecursive(odd)
+        realForwardRecursive(&even)
+        realForwardRecursive(&odd)
 
         for (i in 0 until n / 2) {
             val t = cosTable[i] * odd[i] - sinTable[i] * even[i]

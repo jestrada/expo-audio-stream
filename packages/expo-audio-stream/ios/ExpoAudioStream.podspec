@@ -20,8 +20,18 @@ Pod::Spec.new do |s|
   # Swift/Objective-C compatibility
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
-    'SWIFT_COMPILATION_MODE' => 'wholemodule'
+    'SWIFT_COMPILATION_MODE' => 'wholemodule',
+    'ENABLE_TESTING_SEARCH_PATHS' => 'YES'
   }
 
   s.source_files = "**/*.{h,m,mm,swift}"
+
+  s.exclude_files = 'Tests/'
+  s.test_spec do |test_spec|
+    # test_spec.dependency 'OCMock' # This dependency will only be linked with your tests.
+
+    test_spec.source_files = 'Tests/**/*.{m,swift}'
+    test_spec.dependency 'ExpoModulesCore'
+    test_spec.framework = 'XCTest'
+  end
 end
