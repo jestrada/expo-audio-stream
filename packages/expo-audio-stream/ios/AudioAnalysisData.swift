@@ -18,6 +18,7 @@ public struct AudioAnalysisData {
     public var amplitudeRange: (min: Float, max: Float)
     public var speakerChanges: [(timestamp: Float, speaker: Int)]?
     public var extractionTimeMs: Float
+    public var detectedClicks: [TimeInterval]
 }
 
 extension AudioAnalysisData {
@@ -33,7 +34,8 @@ extension AudioAnalysisData {
             "dataPoints": dataPointsArray,
             "amplitudeRange": ["min": amplitudeRange.min, "max": amplitudeRange.max],
             "speakerChanges": speakerChanges?.map { ["timestamp": $0.timestamp, "speaker": $0.speaker] } ?? [],
-            "extractionTimeMs": extractionTimeMs
+            "extractionTimeMs": extractionTimeMs,
+            "detectedClicks": detectedClicks
         ]
     }
 }

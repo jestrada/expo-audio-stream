@@ -80,4 +80,5 @@ export interface AudioAnalysis {
         timestamp: number // Timestamp of the speaker change in milliseconds.
         speaker: number // Speaker identifier.
     }[]
+    detectedClicks: number[]
 }

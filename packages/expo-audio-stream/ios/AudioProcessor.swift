@@ -1,8 +1,9 @@
 // AudioProcessor.swift
 
-import Foundation
-import Accelerate
 import AVFoundation
+import Accelerate
+import ClickDetection
+import Foundation
 import QuartzCore
 
 public class AudioProcessor {
@@ -15,6 +16,8 @@ public class AudioProcessor {
     private var currentProgress: Float = 0.0
     private let extractionQueue = DispatchQueue(label: "AudioProcessor", attributes: .concurrent)
     private var _abortExtraction: Bool = false
+    private var clickDetector: ClickDetection?
+    private var lastProcessingTime: TimeInterval?
         
     // Add a counter for unique IDs
     private var uniqueIdCounter = 0
@@ -29,6 +32,11 @@ public class AudioProcessor {
         self.audioFile = try AVAudioFile(forReading: url)
         self.result = resolve
         self.reject = reject
+    }
+
+    func initializeClickDetection() {
+      let settings = ClickDetectionSettings()
+      self.clickDetector = ClickDetection(settings: settings)
     }
     
     // Initializer for buffer-based processing
@@ -250,6 +258,19 @@ public class AudioProcessor {
 
         Logger.debug("Processed \(dataPoints.count) data points in \(processingTimeMs) ms")
 
+        var detectedClicks: [TimeInterval] = []
+        if let detector = clickDetector {
+          let currentTime = CACurrentMediaTime()
+          let clicks = detector.processBuffer(channelData, timestamp: currentTime)
+
+          if !clicks.isEmpty {
+            NSLog("Detected \(clicks.count) clicks")
+          }
+          detectedClicks = clicks.map{ $0.timestamp }
+
+          lastProcessingTime = currentTime
+        }
+
         return AudioAnalysisData(
             pointsPerSecond: pointsPerSecond,
             durationMs: durationMs,
@@ -260,7 +281,8 @@ public class AudioProcessor {
             dataPoints: dataPoints,
             amplitudeRange: (min: minAmplitude, max: maxAmplitude),
             speakerChanges: [],
-            extractionTimeMs: processingTimeMs
+            extractionTimeMs: processingTimeMs,
+            detectedClicks: detectedClicks
         )
     }
     
